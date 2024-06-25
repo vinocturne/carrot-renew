@@ -4,6 +4,7 @@ import SocialLogin from '@/components/social-login';
 import { useFormState } from 'react-dom';
 import { createAccount } from './actions';
 import Input from '@/components/input';
+import { PASSWORD_MIN_LENGTH } from '@/lib/constants';
 export default function CreateAccount() {
   const [state, dispatch] = useFormState(createAccount, null);
   return (
@@ -13,22 +14,14 @@ export default function CreateAccount() {
         <h2 className="text-xl">Fill in the form below to join!</h2>
       </div>
       <form action={dispatch} className="flex flex-col gap-3">
-        <Input
-          name="username"
-          type="text"
-          placeholder="Username"
-          required
-          errors={state?.fieldErrors.username}
-          minLength={3}
-          maxLength={10}
-        />
+        <Input name="username" type="text" placeholder="Username" required errors={state?.fieldErrors.username} />
         <Input name="email" type="email" placeholder="Email" required errors={state?.fieldErrors.email} minLength={4} />
         <Input
           name="password"
           type="password"
           placeholder="Password"
           required
-          minLength={4}
+          minLength={PASSWORD_MIN_LENGTH}
           errors={state?.fieldErrors.password}
         />
         <Input
@@ -36,7 +29,7 @@ export default function CreateAccount() {
           type="password"
           placeholder="Confirm Password"
           required
-          minLength={4}
+          minLength={PASSWORD_MIN_LENGTH}
           errors={state?.fieldErrors.confirm_password}
         />
         <FormButton text="Create Account" />
