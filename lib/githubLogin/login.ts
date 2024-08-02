@@ -23,3 +23,21 @@ export async function getUserProfile(accessToken: string) {
   });
   return await userProfileResponse.json();
 }
+
+export async function getUseEmail(accessToken: string) {
+  const userEmailResponse = await fetch('https://api.github.com/user/emails', {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+    cache: 'no-cache',
+  });
+  const emailList = await userEmailResponse.json();
+  let email = '';
+  for (let mail of emailList) {
+    if (mail.primary && mail.verified && mail.visibility === 'public') {
+      email = mail.email;
+      break;
+    }
+  }
+  return email;
+}

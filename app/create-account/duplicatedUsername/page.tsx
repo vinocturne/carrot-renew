@@ -20,6 +20,7 @@ export default function DuplicatedUsername() {
         <Input name="username" type="text" placeholder="Username" required errors={state?.fieldErrors.username} />
         <Input name="github_id" className="hidden" defaultValue={searchParams.get('id')!} type="text" />
         <Input name="avatar" className="hidden" defaultValue={searchParams.get('avatar_url')!} type="text" />
+        <Input name="email" className="hidden" defaultValue={searchParams.get('email')!} type="text" />
         <FormButton text="Create Account" />
       </form>
     </div>

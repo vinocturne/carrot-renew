@@ -1,5 +1,5 @@
 import db from '@/lib/db';
-import { getAccessToken, getUserProfile } from '@/lib/githubLogin/login';
+import { getAccessToken, getUseEmail, getUserProfile } from '@/lib/githubLogin/login';
 import { getSession, updateSession } from '@/lib/session';
 import { notFound, redirect } from 'next/navigation';
 import { NextRequest } from 'next/server';
@@ -19,6 +19,7 @@ export async function GET(request: NextRequest) {
   }
 
   const { id, avatar_url, login } = await getUserProfile(access_token);
+  const email = await getUseEmail(access_token);
   const user = await db.user.findUnique({
     where: {
       github_id: id + '',
@@ -43,10 +44,10 @@ export async function GET(request: NextRequest) {
   });
   // 유저 이름 중복일 경우 닉네임 설정 페이지로 이동
   if (duplicatedUsername) {
-    console.log('닉네임 중복!!!!');
     const params = {
       id,
       avatar_url,
+      email,
     };
     const formattedParams = new URLSearchParams(params).toString();
     return redirect(`/create-account/duplicatedUsername?${formattedParams}`);
@@ -56,7 +57,8 @@ export async function GET(request: NextRequest) {
     data: {
       github_id: id + '',
       avatar: avatar_url,
-      username: login + '_gh',
+      email,
+      username: login,
     },
     select: {
       id: true,

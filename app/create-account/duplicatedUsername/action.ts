@@ -40,6 +40,7 @@ export async function createNewUsernameAccount(prevState: any, formData: FormDat
     username: formData.get('username'),
     github_id: formData.get('github_id'),
     avatar: formData.get('avatar'),
+    email: formData.get('email'),
   };
   const result = await formSchema.spa(data);
   if (!result.success) {
@@ -50,6 +51,7 @@ export async function createNewUsernameAccount(prevState: any, formData: FormDat
         username: result.data.username,
         github_id: data.github_id as string,
         avatar: data.avatar as string,
+        email: data.email as string,
       },
       select: {
         id: true,
