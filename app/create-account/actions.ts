@@ -1,7 +1,7 @@
 'use server';
 import { PASSWORD_MIN_LENGTH, PASSWORD_REGEX, PASSWORD_REGEX_ERROR } from '@/lib/constants';
 import db from '@/lib/db';
-import getSession from '@/lib/session';
+import { getSession, updateSession } from '@/lib/session';
 import bcrypt from 'bcrypt';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
@@ -124,9 +124,7 @@ export async function createAccount(prevState: any, formData: FormData) {
         id: true,
       },
     });
-    const session = await getSession();
-    session.id = user.id;
-    await session.save();
+    await updateSession(user.id);
     redirect('/profile');
   }
 }

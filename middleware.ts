@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
-import getSession from './lib/session';
+import { getSession } from './lib/session';
 
 interface Routes {
   [key: string]: boolean;
@@ -10,6 +10,9 @@ const publicOnlyUrls: Routes = {
   '/login': true,
   '/sms': true,
   '/create-account': true,
+  '/github/start': true,
+  '/github/complete': true,
+  '/create-account/duplicatedUsername': true,
 };
 
 export async function middleware(request: NextRequest) {
