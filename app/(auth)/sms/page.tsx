@@ -5,6 +5,7 @@ import Input from '@/components/input';
 import { useFormState } from 'react-dom';
 import { smsLogin } from './actions';
 const initialState = {
+  phone: '',
   token: false,
   error: undefined,
 };
