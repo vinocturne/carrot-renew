@@ -4,13 +4,14 @@ import FormButton from '@/components/button';
 import FormInput from '@/components/input';
 import { PhotoIcon } from '@heroicons/react/24/solid';
 import { useState } from 'react';
-import { uploadProudct } from './action';
+import { getUploadUrl, uploadProduct } from './action';
 import { useFormState } from 'react-dom';
 
 export default function AddProduct() {
   const [preview, setPreview] = useState('');
-  const [state, action] = useFormState(uploadProudct, null);
-  const onImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const [photoId, setPhotoId] = useState('');
+  const [uploadUrl, setUploadUrl] = useState('');
+  const onImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const maxSized = 4 * 1024 * 1024;
     const {
       target: { files },
@@ -25,7 +26,36 @@ export default function AddProduct() {
     }
     const url = URL.createObjectURL(file);
     setPreview(url);
+    const { success, result } = await getUploadUrl();
+    if (success) {
+      const { id, uploadURL } = result;
+      setUploadUrl(uploadURL);
+      setPhotoId(id);
+    }
   };
+  const interceptAction = async (_: any, formData: FormData) => {
+    const file = formData.get('photo');
+    if (!file) {
+      return;
+    }
+    // upload Image to Cloud
+    // replace photo in formData
+    // call upload product
+    const cloudflareForm = new FormData();
+    cloudflareForm.append('file', file);
+    const response = await fetch(uploadUrl, {
+      method: 'post',
+      body: cloudflareForm,
+    });
+    if (response.status !== 200) {
+      return;
+    }
+    const photoUrl = `https://imagedelivery.net/IfkIh2vCOXio26cf7UQYpw/${photoId}`;
+    formData.set('photo', photoUrl);
+    return uploadProduct(_, formData);
+  };
+  const [state, action] = useFormState(interceptAction, null);
+
   return (
     <div>
       <form action={action} className="p-5 flex flex-col gap-5">
