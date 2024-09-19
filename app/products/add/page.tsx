@@ -1,16 +1,29 @@
 'use client';
 
 import FormButton from '@/components/button';
-import FormInput from '@/components/input';
+import Input from '@/components/input';
 import { PhotoIcon } from '@heroicons/react/24/solid';
 import { useState } from 'react';
 import { getUploadUrl, uploadProduct } from './action';
 import { useFormState } from 'react-dom';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { ProductType, productSchema } from './schema';
 
 export default function AddProduct() {
   const [preview, setPreview] = useState('');
   const [photoId, setPhotoId] = useState('');
   const [uploadUrl, setUploadUrl] = useState('');
+  const [file, setFile] = useState<File | null>(null);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+  } = useForm<ProductType>({
+    resolver: zodResolver(productSchema),
+  });
+
   const onImageChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const maxSized = 4 * 1024 * 1024;
     const {
@@ -26,15 +39,17 @@ export default function AddProduct() {
     }
     const url = URL.createObjectURL(file);
     setPreview(url);
+    setFile(file);
     const { success, result } = await getUploadUrl();
     if (success) {
       const { id, uploadURL } = result;
       setUploadUrl(uploadURL);
       setPhotoId(id);
+
+      setValue('photo', `https://imagedelivery.net/IfkIh2vCOXio26cf7UQYpw/${id}`);
     }
   };
-  const interceptAction = async (_: any, formData: FormData) => {
-    const file = formData.get('photo');
+  const onSubmit = handleSubmit(async (data: ProductType) => {
     if (!file) {
       return;
     }
@@ -50,15 +65,20 @@ export default function AddProduct() {
     if (response.status !== 200) {
       return;
     }
-    const photoUrl = `https://imagedelivery.net/IfkIh2vCOXio26cf7UQYpw/${photoId}`;
-    formData.set('photo', photoUrl);
-    return uploadProduct(_, formData);
-  };
-  const [state, action] = useFormState(interceptAction, null);
+    const formData = new FormData();
+    formData.append('title', data.title);
+    formData.append('price', data.price + '');
+    formData.append('description', data.description);
+    formData.append('photo', data.photo);
+    return uploadProduct(formData);
+  });
 
+  const onValid = async () => {
+    await onSubmit();
+  };
   return (
     <div>
-      <form action={action} className="p-5 flex flex-col gap-5">
+      <form action={onValid} onSubmit={handleSubmit(onValid)} className="p-5 flex flex-col gap-5">
         <label
           htmlFor="photo"
           className="border-2 aspect-square flex items-center justify-center flex-col text-neutral-300 border-neutral-300 rounded-md border-dashed cursor-pointer bg-center bg-cover"
@@ -67,7 +87,7 @@ export default function AddProduct() {
           {preview === '' ? (
             <>
               <PhotoIcon className="w-20" />
-              <div className="text-neutral-400 text-sm">사진을 추가해주세요.{state?.fieldErrors.photo}</div>
+              <div className="text-neutral-400 text-sm">사진을 추가해주세요.{errors.photo?.message}</div>
             </>
           ) : null}
         </label>
@@ -79,14 +99,20 @@ export default function AddProduct() {
           name="photo"
           className="hidden"
         />
-        <FormInput name="title" required placeholder="제목" type="text" errors={state?.fieldErrors.title} />
-        <FormInput name="price" required placeholder="가격" type="number" errors={state?.fieldErrors.price} />
-        <FormInput
-          name="description"
+        <Input required placeholder="제목" type="text" errors={[errors.title?.message ?? '']} {...register('title')} />
+        <Input
+          required
+          placeholder="가격"
+          type="number"
+          errors={[errors.price?.message ?? '']}
+          {...register('price')}
+        />
+        <Input
+          {...register('description')}
           required
           placeholder="자세한 설명"
           type="string"
-          errors={state?.fieldErrors.description}
+          errors={[errors.description?.message ?? '']}
         />
         <FormButton text="작성 완료" />
       </form>
