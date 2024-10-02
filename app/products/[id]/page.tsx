@@ -1,36 +1,10 @@
-import db from '@/lib/db';
-import { getSession } from '@/lib/session';
 import { formatToWon } from '@/lib/utils';
 import { UserIcon } from '@heroicons/react/24/solid';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import DeleteButton from './delete-button/delete-button';
-
-async function getIsOwner(userId: number) {
-  const session = await getSession();
-  if (session.id) {
-    return session.id === userId;
-  }
-  return false;
-}
-
-async function getProduct(id: number) {
-  const product = await db.product.findUnique({
-    where: {
-      id,
-    },
-    include: {
-      user: {
-        select: {
-          username: true,
-          avatar: true,
-        },
-      },
-    },
-  });
-  return product;
-}
+import { getIsOwner, getProduct } from '@/lib/product-detail';
 
 export default async function ProductDetail({ params }: { params: { id: string } }) {
   const id = Number(params.id);
