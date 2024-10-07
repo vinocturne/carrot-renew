@@ -49,7 +49,7 @@ export default function ProductList({ initialProducts }: ProudctListProps) {
       {products.map(product => (
         <ListProduct key={product.id} {...product} />
       ))}
-      {!isLastPage ? (
+      {/* {!isLastPage ? (
         <span
           ref={trigger}
           style={{ marginTop: `${page + 1 * 900}vh` }}
@@ -57,7 +57,7 @@ export default function ProductList({ initialProducts }: ProudctListProps) {
         >
           {isLoading ? '로딩 중...' : 'Load more...'}
         </span>
-      ) : null}
+      ) : null} */}
     </div>
   );
 }

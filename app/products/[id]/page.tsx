@@ -6,6 +6,15 @@ import { notFound } from 'next/navigation';
 import DeleteButton from './delete-button/delete-button';
 import { getIsOwner, getProduct } from '@/lib/product-detail';
 
+export async function generateMetadata({ params }: { params: { id: string } }) {
+  const id = Number(params.id);
+  const product = await getProduct(id);
+
+  return {
+    title: product?.title,
+  };
+}
+
 export default async function ProductDetail({ params }: { params: { id: string } }) {
   const id = Number(params.id);
   if (isNaN(id)) {
