@@ -25,3 +25,15 @@ export async function getProduct(id: number) {
   });
   return product;
 }
+
+export async function getProductTitle(id: number) {
+  const product = await db.product.findUnique({
+    where: {
+      id,
+    },
+    select: {
+      title: true,
+    },
+  });
+  return product;
+}

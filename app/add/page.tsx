@@ -9,6 +9,7 @@ import { useFormState } from 'react-dom';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ProductType, productSchema } from './schema';
+import { revalidatePath, revalidateTag } from 'next/cache';
 
 export default function AddProduct() {
   const [preview, setPreview] = useState('');
